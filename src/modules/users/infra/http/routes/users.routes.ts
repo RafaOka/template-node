@@ -14,4 +14,6 @@ usersRoutes.get('/:id', usersController.search);
 
 usersRoutes.delete('/:id', usersController.delete);
 
+usersRoutes.post('/update/:id', usersController.update);
+
 export default usersRoutes;

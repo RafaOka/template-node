@@ -1,5 +1,5 @@
 import { inject, injectable } from 'tsyringe';
-import path from 'path';
+// import path from 'path';
 
 import { Users } from '@prisma/client';
 
@@ -10,15 +10,15 @@ import IMailProvider from '@shared/container/providers/MailProvider/models/IMail
 import IUsersRepository from '../repositories/IUsersRepository';
 
 interface IRequest {
+  id: string;
   name: string;
   email: string;
   cpf: string;
   phone: string;
-  password: string;
 }
 
 @injectable()
-export default class CreateUserService {
+export default class UpdateUserService {
   constructor(
     @inject('UsersRepository')
     private usersRepository: IUsersRepository,
@@ -31,38 +31,22 @@ export default class CreateUserService {
   ) { }
 
   public async execute({
-    cpf, email, name, password, phone,
-  }: IRequest): Promise<Users> {
-    const userAlreadyExists = await this.usersRepository.findByEmailPhoneOrCpf(email, phone, cpf);
+    id, cpf, email, name, phone,
+  }: IRequest): Promise<Users | null> {
+    const check = this.usersRepository.findById(id);
 
-    if (userAlreadyExists) throw new AppError('User with same name, phone or cpf already exists');
+    if (await check == null) throw new AppError('Usuario não encontrado');
 
-    if (cpf === '' || email === '' || name === '' || password === '' || phone === '') {
+    if (cpf === '' || email === '' || name === '' || phone === '') {
       throw new AppError('Alguma informação vazia');
     }
 
-    const hashedPassword = await this.hashProvider.generateHash(password);
-
-    const user = this.usersRepository.create({
+    const user = this.usersRepository.update({
+      id,
       name,
       email: email.toLowerCase(),
       cpf,
-      password: hashedPassword,
       phone,
-    });
-
-    const templateDataFile = path.resolve(__dirname, '..', 'views', 'create_account.hbs');
-
-    await this.mailProvider.sendMail({
-      to: {
-        name,
-        email,
-      },
-      subject: 'Criação de conta',
-      templateData: {
-        file: templateDataFile,
-        variables: { name },
-      },
     });
 
     return user;

@@ -6,6 +6,7 @@ import ListenUserService from '@modules/users/services/ListenUserService';
 // import { FindOperator } from 'typeorm';
 import FindUserService from '@modules/users/services/FindUserService';
 import DeleteUserService from '@modules/users/services/DeleteUserService';
+import UpdateUserService from '@modules/users/services/UpdateUserService';
 
 export default class UserController {
   public async create(req: Request, res: Response): Promise<Response> {
@@ -56,5 +57,28 @@ export default class UserController {
     const user = await deleteUser.execute(id);
 
     return res.status(200).json(user);
+  }
+
+  public async update(req: Request, res: Response): Promise<Response> {
+    const {
+      name,
+      email,
+      cpf,
+      phone,
+    } = req.body;
+
+    const { id } = req.params;
+
+    const update = container.resolve(UpdateUserService);
+
+    const user = await update.execute({
+      id,
+      name,
+      email,
+      cpf,
+      phone,
+    });
+
+    return res.status(201).json(user);
   }
 }

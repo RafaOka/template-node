@@ -3,6 +3,7 @@ import { Prisma, Users } from '@prisma/client';
 
 import IUsersRepository from '@modules/users/repositories/IUsersRepository';
 import ICreateUserDTO from '@modules/users/dtos/ICreateUserDTO';
+import IUpdateUserDTO from '@modules/users/dtos/IUpdateUserDTO';
 
 export default class UsersRepository implements IUsersRepository {
   private ormRepository: Prisma.UsersDelegate<Prisma.RejectOnNotFound | Prisma.RejectPerOperation | undefined>
@@ -50,6 +51,23 @@ export default class UsersRepository implements IUsersRepository {
   public async delete(id: string): Promise<Users | null> {
     const user = await this.ormRepository.delete({
       where: { id },
+    });
+
+    return user;
+  }
+
+  public async update({
+    id, name, email, cpf, phone,
+  }: IUpdateUserDTO): Promise<Users | null> {
+    const user = this.ormRepository.update({
+      where: { id },
+      data: {
+        name,
+        email,
+        cpf,
+        phone,
+        updated_at: new Date(),
+      },
     });
 
     return user;
