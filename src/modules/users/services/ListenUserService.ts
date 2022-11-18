@@ -21,9 +21,9 @@ export default class ListenUserService {
     private mailProvider: IMailProvider,
   ) { }
 
-  public async execute(): Promise<Users[]> {
-    const user = this.usersRepository.listen();
+  public async execute(): Promise<Omit<Users, 'password'>[]> {
+    const usersWithoutPassword = (await this.usersRepository.listen()).map(({ password: _, ...userWithoutPassword }) => userWithoutPassword);
 
-    return user;
+    return usersWithoutPassword;
   }
 }

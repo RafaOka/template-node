@@ -1,0 +1,30 @@
+model Pius {
+    id         String     @id @default(uuid())
+    user_id    String
+    user       Users      @relation(fields: [user_id], references: [id], onDelete: Cascade)
+    text       String
+    created_at DateTime   @default(now())
+    update_at  DateTime   @updatedAt
+    likes      PiuUsers[]
+
+    @@map("pius")
+}
+
+model Users {
+    id       String     @id @default(uuid())
+    pius     Pius[]
+    piuUsers PiuUsers[]
+
+    @@map("users")
+}
+
+model PiuUsers {
+    id       String   @id @default(uuid())
+    idPiu    String
+    pius     Pius     @relation(fields: [idPiu], references: [id], onDelete: Cascade)
+    idsUsers String
+    users    Users    @relation(fields: [idsUsers], references: [id], onDelete: Cascade)
+    createAt DateTime @default(now())
+
+    @@map("piuusers")
+}

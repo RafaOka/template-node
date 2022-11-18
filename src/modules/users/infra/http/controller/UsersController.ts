@@ -28,8 +28,6 @@ export default class UserController {
       password,
     });
 
-    user.password = '###';
-
     return res.status(201).json(user);
   }
 
@@ -51,7 +49,7 @@ export default class UserController {
   }
 
   public async delete(req: Request, res: Response): Promise<Response> {
-    const { id } = req.params;
+    const { id } = req.user;
 
     const deleteUser = container.resolve(DeleteUserService);
     const user = await deleteUser.execute(id);
@@ -67,7 +65,7 @@ export default class UserController {
       phone,
     } = req.body;
 
-    const { id } = req.params;
+    const { id } = req.user;
 
     const update = container.resolve(UpdateUserService);
 

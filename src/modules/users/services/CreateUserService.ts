@@ -32,7 +32,7 @@ export default class CreateUserService {
 
   public async execute({
     cpf, email, name, password, phone,
-  }: IRequest): Promise<Users> {
+  }: IRequest): Promise<Omit<Users, 'password'>> {
     const userAlreadyExists = await this.usersRepository.findByEmailPhoneOrCpf(email, phone, cpf);
 
     if (userAlreadyExists) throw new AppError('User with same name, phone or cpf already exists');
@@ -43,7 +43,7 @@ export default class CreateUserService {
 
     const hashedPassword = await this.hashProvider.generateHash(password);
 
-    const user = this.usersRepository.create({
+    const { password: _, ...userWithoutPassword } = await this.usersRepository.create({
       name,
       email: email.toLowerCase(),
       cpf,
@@ -65,6 +65,6 @@ export default class CreateUserService {
       },
     });
 
-    return user;
+    return userWithoutPassword;
   }
 }
